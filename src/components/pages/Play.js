@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { RiCoinsLine } from "react-icons/ri";
 import { MdAlarm ,MdLiveHelp } from "react-icons/md";
 import M from 'materialize-css';
+import swal from 'sweetalert';
 
 
 
@@ -78,24 +79,6 @@ handleOptionClick = (e) => {
       this.wrongAnswer();
   }
 }
-
-
-handleQuitButtonClick = () => {
-  if (window.confirm('Are you sure you want to quit?')) {
-      this.props.history.push('/');
-  }
-};
-
-handleButtonClick = (e) => {
-  switch (e.target.id) {
-      case 'quit-button':
-          this.handleQuitButtonClick();
-          break;
-
-      default:
-          break;
-  }
-};
 
 
 
@@ -213,24 +196,50 @@ startTimer = () => {
 
 
 
+
 endGame = () => {
-  alert('Quiz has eneded!');
-  const { state } = this;
-  const playerStats = {
-      score: state.score,
-      numberOfQuestions: state.numberOfQuestions,
-      numberOfAnsweredQuestions: state.correctAnswers + state.wrongAnswers,
-      correctAnswers: state.correctAnswers,
-      wrongAnswers: state.wrongAnswers,
-      hintsUsed: 2 - state.hints
-  };
-  setTimeout(() => {
-      this.props.history.push('/result', playerStats); 
-  }, 1000);
-}
+    {this.endAlert()};
+    const { state } = this;
+    const playerStats = {
+        score: state.score,
+        numberOfQuestions: state.numberOfQuestions,
+        numberOfAnsweredQuestions: state.correctAnswers + state.wrongAnswers,
+        correctAnswers: state.correctAnswers,
+        wrongAnswers: state.wrongAnswers,
+        hintsUsed: 2 - state.hints
+    };
+    setTimeout(() => {
+        this.props.history.push('/play/Result', playerStats);
+    }, 2000);
+  }
+  
+  endAlert = () => {
+    swal("Good job!", "Your game has ended!", "success");
+  }
 
 
   render() {
+
+    const quitAlert = () =>{
+        swal({
+          title: "Are you sure to close it?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willClose) => {
+          if (willClose) {          
+            swal("Thank you so much!", {
+              icon: "success",
+              timer: "3000",
+            })
+            .then(() => {
+              this.props.history.push('/');
+            })          
+          }
+        });
+      }
+  
 
     const { 
       currentQuestion, 
@@ -277,11 +286,9 @@ endGame = () => {
                 {currentQuestion.optionD}
               </button>
             </div>
-          <div className="justify-around p-20 mr-100px">
-            <button type="button" id="quit-button" onClick={this.handleButtonClick} className=" w-32 bg-red-600 hover:bg-red-700 text-gray-800 font-bold py-2 px-4 rounded">
-              Quit {"x"}
+            <button type="button" className=" bg-red-600 hover:bg-red-800 rounded">
+              <button type="button" className="w-32 shadow-lg text-white font-bold py-2 px-4 rounded justify-center text-center"  onClick={quitAlert}>quit</button>
             </button>
-          </div>
         </form>
       </React.Fragment>
     );
